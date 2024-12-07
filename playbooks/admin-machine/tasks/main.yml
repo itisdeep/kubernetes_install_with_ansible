@@ -1,0 +1,39 @@
+---
+  - name: Ensure the downloads directory exists
+    ansible.builtin.file:
+      path: "/home/ansible/downloads"
+      state: directory
+      mode: '0755'
+    register: downloads_directory
+
+  - name: install prereqs
+    apt:
+      name: "{{ item }}"
+      state: present
+    become: yes
+    loop:
+      - wget
+      - curl
+      - vim
+      - openssl
+      - git
+    
+
+  - name: Download all binaries
+    get_url:
+      url: "{{ item.url }}"
+      dest: "{{ downloads_directory.path }}/{{ item.dest }}"
+      mode: '0755'
+      validate_certs: no
+    loop:
+        - { url: "https://dl.k8s.io/{{ kubectl_version }}/bin/darwin/amd64/kubectl", dest: "kubectl" }
+        - { url: "https://dl.k8s.io/{{ kube_version }}/bin/linux/amd64/apiextensions-apiserver", dest: "kube-apiserver" }
+        - { url: "https://dl.k8s.io/{{ kube_version }}/bin/linux/amd64/kube-controller-manager", dest: "kube-controller-manager" }
+        - { url: "https://dl.k8s.io/{{ kube_version }}/bin/linux/amd64/kube-scheduler", dest: "kube-scheduler" }
+        - { url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/{{ cri_tools_version }}/crictl-{{ cri_tools_version }}-linux-amd64.tar.gz", dest: "crictl-{{ cri_tools_version }}-linux-amd64.tar.gz" }
+        - { url: "https://github.com/opencontainers/runc/releases/download/{{ runc_version }}/runc.amd64", dest: "runc" }
+        - { url: "https://github.com/containernetworking/plugins/releases/download/{{ cni_plugins_version }}/cni-plugins-linux-amd64-{{ cni_plugins_version }}.tgz", dest: "cni-plugins-linux-amd64-{{ cni_plugins_version }}.tgz" }
+        - { url: "https://github.com/containerd/containerd/releases/download/{{ containerd_version }}/containerd-{{ containerd_version | regex_replace('^v', '') }}-linux-amd64.tar.gz", dest: "containerd-{{ containerd_version }}-linux-amd64.tar.gz" }
+        - { url: "https://dl.k8s.io/{{ kube_version }}/bin/linux/amd64/kube-proxy", dest: "kube-proxy" }
+        - { url: "https://dl.k8s.io/{{ kube_version }}/bin/linux/amd64/kubelet", dest: "kubelet" }
+        - { url: "https://github.com/etcd-io/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz", dest: "etcd-{{ etcd_version }}-linux-amd64.tar.gz" }

@@ -1,0 +1,20 @@
+all:
+  children:
+    controller:
+      hosts:
+        controller-0:
+          ansible_host: 192.168.1.100  
+          ansible_user: ansible
+    worker:
+      hosts:
+        worker-0:
+          ansible_host: 192.168.1.101
+          ansible_user: ansible
+        worker-1:
+          ansible_host: 192.168.1.114
+          ansible_user: ansible      
+    admin-machine:
+      hosts:
+        admin-machine:
+          ansible_host: 192.168.1.115
+          ansible_user: ansible

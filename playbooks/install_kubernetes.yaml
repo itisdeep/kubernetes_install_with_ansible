@@ -1,0 +1,6 @@
+---
+- name: Install Kubernetes
+  hosts: '{{ hostname }}'
+  gather_facts: true
+  roles:
+    - admin-machine
