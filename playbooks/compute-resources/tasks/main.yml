@@ -1,0 +1,10 @@
+---
+# tasks file for compute-resources
+- name: Allow root login
+  ansible.builtin.replace: 
+    path: /etc/ssh/sshd_config
+    regexp: '^#PermitRootLogin.*'
+    replace: 'PermitRootLogin yes'
+    backup: yes
+  become: yes
+  notify: restart sshd

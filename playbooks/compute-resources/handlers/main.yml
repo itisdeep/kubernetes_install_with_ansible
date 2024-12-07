@@ -1,0 +1,6 @@
+---
+# handlers file for compute-resources
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted
