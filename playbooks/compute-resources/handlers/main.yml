@@ -1,6 +1,24 @@
 ---
 # handlers file for compute-resources
 - name: restart sshd
-  service:
-    name: sshd
-    state: restarted
+  become: yes
+  block:
+  - name: Disable ssh socket
+    systemd:
+      name: sshd.socket
+      enabled: no
+      state: stopped
+    register: service_disabled
+  - name: Reload the systemd daemon
+    systemd:
+      daemon_reload: yes
+    when: service_disabled.changed
+  - name: Stop ssh
+    service:
+      name: ssh
+      state: stop
+  - name: Start ssh
+    service:
+      name: ssh
+      state: start
+    
