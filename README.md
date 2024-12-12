@@ -25,8 +25,17 @@ Setup hostnames for each of the machines and update the inventory.yaml file with
 To install kubernetes with ansible, we use ansible galaxy in this tutorial and setup following roles for various stages.
 * admin-machine
 * compute-resources
+* Certificates
 
-## Execution
-* Change the `inventory.yaml` file with the hostnames and ipaddresses for your setup.
+
+* Change the `inventory.yaml` file with the hostnames or ipaddresses for your setup.
+
+## Admin machine
 * Under `admin-machine/files/machine.txt` update the entries accordingly as it will be used later to update the host entries on admin machines.
-* Add the similar file under `compute-resources/files/` as these will be used later to update the host entries on Kubernetes cluster controller and worker nodes.
+
+## Compute resources (worker and controller nodes)
+* Under `compute-resources/files/machine.txt` update the entries accordingly as it will be used later to update the host entries on controller and worker machines.
+
+## Certificates
+To generate certificates for internal node and kubernetes components communication we need a configuration file in order to generate CA certificate. This file will be used to generate the signing request in the playbook for certs role.
+* Update `vars/main.yml` file as per your needs
