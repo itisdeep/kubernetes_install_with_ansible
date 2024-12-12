@@ -1,12 +1,12 @@
 ---
 # vars file for certs
-ca_dir: "/tmp/ca"
-certs_dir: "/tmp/certs"
-conf_dir: "/tmp/conf"
-ca_key: "{{ ca_dir }}/ca.key"
+ca_dir: "/tmp/ca"   #Path on local machine to store certs momentarily after generation
+certs_dir: "/tmp/certs" #Path on local machine to store certs momentarily after generation
+conf_dir: "/tmp/conf" #Path on local machine to generate ca.conf file
+ca_key: "{{ ca_dir }}/ca.key"  
 ca_cert: "{{ ca_dir }}/ca.crt"
 ca_conf: "{{ ca_dir }}/ca.conf"
 common_conf: "{{ ca_dir }}/common.conf"
-domain: "myrrhsolutions.co.in"
+domain: "myrrhsolutions.co.in"   #If you have a domain for which you want certs to be generated as well
 kubelet_path: "/var/lib/kubelet"
-ansible_user: "ansible"
+ansible_user: "ansible"   #any other user under which you are running ansible playbooks
