@@ -59,3 +59,12 @@
     state: directory
     mode: '0700'
   become: true
+
+- name: Update hostfile on kube machines
+  become: yes
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      # Added by Ansible to update /etc/hosts
+      {{ lookup('file', 'files/machines.txt') }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
