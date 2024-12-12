@@ -1,12 +1,18 @@
 ---
+- hosts: all
+  gather_facts: true  # Gather facts once at the beginning of the playbook
+
 - name: Setup admin machine
   hosts: "admin-machine"
-  gather_facts: true
   roles:
     - admin-machine
 
 - name: Setup compute resources
   hosts: "kube-machines"
-  gather_facts: true
   roles:
     - compute-resources
+
+- name: Setup certificates
+  hosts: localhost
+  roles:
+    - certs

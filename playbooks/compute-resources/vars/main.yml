@@ -1,3 +1,5 @@
 ---
 # vars file for compute-resources
 hostname: kube-machines
+kubelet_path: "/var/lib/kubelet"
+ansible_user: "ansible"

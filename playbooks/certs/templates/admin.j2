@@ -1,0 +1,10 @@
+
+
+[{{ item }}]
+distinguished_name = {{ item }}_distinguished_name
+prompt             = no
+req_extensions     = default_req_extensions
+
+[{{ item }}_distinguished_name]
+CN = {{ item }}
+O  = system:masters

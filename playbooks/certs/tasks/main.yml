@@ -1,0 +1,112 @@
+---
+- name: Ensure certificate directory structure exists
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0700'
+  with_items:
+    - "{{ ca_dir }}"
+    - "{{ certs_dir }}"
+    - "{{ conf_dir }}"
+
+- name: Generate CA private key
+  community.crypto.openssl_privatekey:
+    path: "{{ ca_key }}"
+    size: 4096
+    state: present
+    type: RSA
+
+- name: Copy CA conf file
+  copy:
+    src: "common.conf"
+    dest: "{{ common_conf }}"
+    force: no
+
+- name: Generate self-signed CA certificate
+  command: "openssl req -x509 -new -sha512 -noenc -key {{ ca_key }} -config {{ common_conf }} -days 3653 -out {{ ca_cert }}"
+
+- name: generate admin certificate conf
+  template:
+    src: "admin.j2"
+    dest: "{{ conf_dir }}/{{ item }}.conf"
+  with_items:
+    - "{{ groups['admin-machine'] }}"
+
+- name: Generate node certificate conf
+  template:
+    src: "node.j2"
+    dest: "{{ conf_dir }}/{{ item }}.conf"
+  with_items:
+    - "{{ groups['worker'] }}"
+
+- name: Generate cert config file for kube components
+  template:
+    src: "kube.j2"
+    dest: "{{ conf_dir }}/kube.conf"
+
+- name: Generate combined config file
+  assemble:
+    src: "{{ conf_dir }}"
+    dest: "{{ ca_conf }}"
+    mode: '0644'
+
+- name: Create client and server private keys
+  openssl_privatekey:
+    path: "{{ certs_dir }}/{{ item }}.key"
+  with_items:
+    - "{{ groups['admin-machine'] }}"
+    - "{{ groups['worker'] }}"
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kube-proxy
+    - service-accounts
+
+- name: Generate client and server certificate signing requests
+  command: "openssl req -new -key {{ certs_dir }}/{{ item }}.key -sha256 \\
+            -config {{ ca_conf }} -section {{ item }} \\
+            -out {{ certs_dir }}/{{ item }}.csr"
+  with_items:
+    - "{{ groups['admin-machine'] }}"
+    - "{{ groups['worker'] }}"
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kube-proxy
+    - service-accounts
+
+- name: Sign the client and server certificates
+  command: "openssl x509 -req -days 3653 -in {{ certs_dir }}/{{ item }}.csr \\
+            -copy_extensions copyall -sha256 -CA {{ ca_dir }}/ca.crt \\
+            -CAkey {{ ca_dir }}/ca.key -CAcreateserial \\
+            -out {{ certs_dir }}/{{ item }}.crt"
+  with_items:
+    - "{{ groups['admin-machine'] }}"
+    - "{{ groups['worker'] }}"
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kube-proxy
+    - service-accounts
+
+- name: Distribute worker certs (crt) to the correct worker node
+  copy:
+    src: "{{ certs_dir }}/{{ item }}.crt"
+    dest: "{{ kubelet_path }}/"
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  loop: "{{ groups['worker'] }}"
+  delegate_to: "{{ item }}"
+
+- name: Distribute worker certs (key) to the correct worker node
+  copy:
+    src: "{{certs_dir}}/{{ item }}.key"
+    dest: "{{ kubelet_path }}/"
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  loop: "{{ groups['worker'] }}"
+  delegate_to: "{{ item }}"

@@ -1,0 +1,12 @@
+---
+# vars file for certs
+ca_dir: "/tmp/ca"
+certs_dir: "/tmp/certs"
+conf_dir: "/tmp/conf"
+ca_key: "{{ ca_dir }}/ca.key"
+ca_cert: "{{ ca_dir }}/ca.crt"
+ca_conf: "{{ ca_dir }}/ca.conf"
+common_conf: "{{ ca_dir }}/common.conf"
+domain: "myrrhsolutions.co.in"
+kubelet_path: "/var/lib/kubelet"
+ansible_user: "ansible"
