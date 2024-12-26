@@ -1,0 +1,3 @@
+- name: Copy files
+  shell: "scp -o StrictHostKeyChecking=no -p {{ files }} {{ ansible_user }}@{{ item }}:~"
+  loop: "{{ groups['controller'] }}"

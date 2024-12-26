@@ -1,3 +1,4 @@
 192.168.1.117 controller-0.myrrhsolutions.co.in controller-0  
-192.168.1.118 worker-0.myrrhsolutions.co.in worker-0 
-192.168.1.119 worker-1.myrrhsolutions.co.in worker-1 
+192.168.1.120 worker-0.myrrhsolutions.co.in worker-0 
+192.168.1.121 worker-1.myrrhsolutions.co.in worker-1 
+192.168.1.115 admin-machine.myrrhsolutions.co.in admin-machine

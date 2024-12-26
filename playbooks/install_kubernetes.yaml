@@ -6,13 +6,19 @@
   hosts: "admin-machine"
   roles:
     - admin-machine
+  tags: 
+    - admin-machine
 
 - name: Setup compute resources
   hosts: "kube-machines"
   roles:
     - compute-resources
+  tags: 
+    - compute-resources
 
 - name: Setup certificates
-  hosts: localhost
+  hosts: "admin-machine"
   roles:
+    - certs
+  tags: 
     - certs

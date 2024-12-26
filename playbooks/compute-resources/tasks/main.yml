@@ -6,7 +6,7 @@
     regexp: '^#PermitRootLogin.*'
     replace: 'PermitRootLogin yes'
     backup: yes
-  become: yes
+  become: true
   notify: restart sshd
 
 - name: Check if ssh key pair exists
@@ -44,7 +44,7 @@
   file:
     path: "/tmp/{{ inventory_hostname }}_id_rsa.pub"
     state: absent
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Correct permissions of authorized_keys
   ansible.builtin.file:
@@ -61,7 +61,7 @@
   become: true
 
 - name: Update hostfile on kube machines
-  become: yes
+  become: true
   blockinfile:
     path: /etc/hosts
     block: |

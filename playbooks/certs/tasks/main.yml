@@ -89,24 +89,39 @@
     - kube-proxy
     - service-accounts
 
-- name: Distribute worker certs (crt) to the correct worker node
-  copy:
-    src: "{{ certs_dir }}/{{ item }}.crt"
-    dest: "{{ kubelet_path }}/"
-    owner: root
-    group: root
-    mode: '0644'
-  become: yes
+- name: Distribute worker certs (key) to the correct worker node
+  shell: "scp -o StrictHostKeyChecking=no -p {{ certs_dir}}/{{ item }}.* {{ ansible_user }}@{{ item }}:~/"
+  # become: true
+  loop: "{{ groups['worker'] }}"
+
+- name: Move certs to correct location on worker
+  shell: "mv ~{{ ansible_user }}/{{ item }}.* {{ kubelet_path }}"
+  become: true
   loop: "{{ groups['worker'] }}"
   delegate_to: "{{ item }}"
 
-- name: Distribute worker certs (key) to the correct worker node
-  copy:
-    src: "{{certs_dir}}/{{ item }}.key"
-    dest: "{{ kubelet_path }}/"
-    owner: root
-    group: root
-    mode: '0644'
-  become: yes
-  loop: "{{ groups['worker'] }}"
-  delegate_to: "{{ item }}"
+- name: Distribute server certs to master nodes
+  shell: "scp -o StrictHostKeyChecking=no -p {{ item.1 }} {{ ansible_user }}@{{ item.0 }}:~"
+  vars:
+    files:
+    - "{{ ca_dir }}/ca.crt"
+    - "{{ ca_dir }}/ca.key"
+    - "{{ certs_dir }}/kube-apiserver.crt"
+    - "{{ certs_dir }}/kube-apiserver.key"
+    - "{{ certs_dir }}/service-accounts.crt"
+    - "{{ certs_dir }}/service-accounts.key"
+  loop: "{{ groups['controller'] | product(files) | list }}"
+
+- name: Move certs to correct location on controller
+  shell: "mv ~{{ ansible_user }}/{{ item.1 }} {{ kubelet_path }}/{{ item.1 }}"
+  become: true
+  vars:
+    files:
+    - "ca.crt"
+    - "ca.key"
+    - "kube-apiserver.crt"
+    - "kube-apiserver.key"
+    - "service-accounts.crt"
+    - "service-accounts.key"
+  loop: "{{ groups['controller'] | product(files) | list }}"
+  delegate_to: "{{ item.0 }}"

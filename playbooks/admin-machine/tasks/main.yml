@@ -10,13 +10,14 @@
   apt:
     name: "{{ item }}"
     state: present
-  become: yes
+  become: true
   loop:
     - wget
     - curl
     - vim
     - openssl
     - git
+  
   
 - name: Download all binaries
   get_url:
@@ -43,10 +44,10 @@
     dest: /usr/local/bin/kubectl
     mode: '0755'
     remote_src: yes
-  become: yes
+  become: true
 
 - name: Update hostfile on admin machine
-  become: yes
+  become: true
   blockinfile:
     path: /etc/hosts
     block: |
