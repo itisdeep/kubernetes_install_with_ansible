@@ -1,0 +1,36 @@
+---
+# tasks file for kubeconfig
+- name: Create kubeconfig files
+  block:
+    - name: Set cluster for {{ item }}
+      command: >
+        kubectl config set-cluster {{ cluster_name }}
+        --certificate-authority={{ ca_dir }}/ca.crt
+        --embed-certs=true
+        --server=https://server.kubernetes.local:6443
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      loop:
+        - "{{ groups['worker'] }}"
+    - name: Set credentials for {{ item }}
+      command: >
+        kubectl config set-credentials system:node:{{ item }}
+        --client-certificate={{ certs_dir }}/{{ item }}.crt
+        --client-key={{ certs_dir }}/{{ item }}.key
+        --embed-certs=true
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      loop:
+        - "{{ groups['worker'] }}"
+    - name: Set context for {{ item }}
+      command: >
+        kubectl config set-context default
+        --cluster={{ cluster_name }}
+        --user=system:node:{{ item }}
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      loop:
+        - "{{ groups['worker'] }}"
+    - name: Use context for {{ item }}
+      command: >
+        kubectl config use-context default
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      loop:
+        - "{{ groups['worker'] }}"

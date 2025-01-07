@@ -1,5 +1,13 @@
 ---
-# vars file for certs
+hostname: "admin-machine"
+kubectl_version: "v1.31.3"
+kube_version: "v1.31.3"
+cri_tools_version: "v1.31.1"
+runc_version: "v1.2.2"
+cni_plugins_version: "v1.6.2"
+containerd_version: "v2.0.0"
+etcd_version: "v3.5.17"
+# vars for certs
 ca_dir: "/tmp/ca"   #Path on local machine to store certs momentarily after generation
 certs_dir: "/tmp/certs" #Path on local machine to store certs momentarily after generation
 conf_dir: "/tmp/conf" #Path on local machine to generate ca.conf file

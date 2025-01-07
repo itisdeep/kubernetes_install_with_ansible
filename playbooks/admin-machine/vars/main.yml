@@ -1,9 +1,0 @@
----
-hostname: admin-machine
-kubectl_version: "v1.31.3"
-kube_version: "v1.31.3"
-cri_tools_version: "v1.31.1"
-runc_version: "v1.2.2"
-cni_plugins_version: "v1.6.1"
-containerd_version: "v2.0.0"
-etcd_version: "v3.5.17"

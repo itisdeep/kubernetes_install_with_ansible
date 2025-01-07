@@ -30,6 +30,13 @@ To install kubernetes with ansible, we use ansible galaxy in this tutorial and s
 
 * Change the `inventory.yaml` file with the hostnames or ipaddresses for your setup.
 
+## Local setup
+* On the machine where you are running ansible, copy your ssh key to all the machines above
+```
+ssh-copy-id ansible@<machine-name>
+```
+Run this command for each machine.
+
 ## Admin machine
 * Under `admin-machine/files/machine.txt` update the entries accordingly as it will be used later to update the host entries on admin machines.
 

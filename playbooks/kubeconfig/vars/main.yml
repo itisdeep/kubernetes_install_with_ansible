@@ -1,0 +1,7 @@
+---
+# vars file for kubeconfig
+ca_dir: "/tmp/ca"
+certs_dir: "/tmp/certs"
+ca_key: "{{ ca_dir }}/ca.key"  
+ca_cert: "{{ ca_dir }}/ca.crt"
+cluster_name: myrrhsol-kubernetes

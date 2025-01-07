@@ -93,6 +93,7 @@
   shell: "scp -o StrictHostKeyChecking=no -p {{ certs_dir}}/{{ item }}.* {{ ansible_user }}@{{ item }}:~/"
   # become: true
   loop: "{{ groups['worker'] }}"
+  tags: now
 
 - name: Move certs to correct location on worker
   shell: "mv ~{{ ansible_user }}/{{ item }}.* {{ kubelet_path }}"

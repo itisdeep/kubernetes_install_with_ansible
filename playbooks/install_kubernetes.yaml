@@ -22,3 +22,10 @@
     - certs
   tags: 
     - certs
+
+- name: Kubelet Config files
+  hosts: "admin-machine"
+  roles:
+    - kubeconfig
+  tags: 
+    - kubeconfig
