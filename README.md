@@ -38,6 +38,12 @@ ssh-copy-id ansible@<machine-name>
 Run this command for each machine.
 
 ## Admin machine
+* Generate ssh-key on admin-machine and copy to other machines
+```
+ssh-key -t rsa -b 2048
+ssh-copy-id ansible@<machine-name>
+```
+
 * Under `admin-machine/files/machine.txt` update the entries accordingly as it will be used later to update the host entries on admin machines.
 
 ## Compute resources (worker and controller nodes)

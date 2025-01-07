@@ -38,12 +38,6 @@
       - { url: "https://dl.k8s.io/{{ kube_version }}/bin/linux/amd64/kubelet", dest: "kubelet" }
       - { url: "https://github.com/etcd-io/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz", dest: "etcd-{{ etcd_version }}-linux-amd64.tar.gz" }
 
-- name: Generate an OpenSSH keypair with the default values (4096 bits, rsa)
-  openssh_keypair:
-    path: /home/{{ ansible_user }}/.ssh/id_rsa
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-
 - name: Set up kubectl on the admin machine
   copy:
     src: "{{ downloads_directory.path }}/kubectl"
