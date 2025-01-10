@@ -17,4 +17,5 @@ ca_conf: "{{ ca_dir }}/ca.conf"
 common_conf: "{{ ca_dir }}/common.conf"
 domain: "myrrhsolutions.co.in"   #If you have a domain for which you want certs to be generated as well
 kubelet_path: "/var/lib/kubelet"
+kube_proxy_path: "/var/lib/kube-proxy"
 ansible_user: "ansible"   #any other user under which you are running ansible playbooks

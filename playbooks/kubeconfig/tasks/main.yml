@@ -1,6 +1,6 @@
 ---
 # tasks file for kubeconfig
-- name: Create kubeconfig files
+- name: Create kubeconfig files for kubelet
   block:
     - name: Set cluster for "{{ item }}"
       command: >
@@ -34,4 +34,105 @@
         --kubeconfig={{ certs_dir }}/"{{ item }}".kubeconfig
       with_items:
         - "{{ groups['worker'] }}"
+
+- name: Create kubeconfig files for other kubernetes components
+  block:
+    - name: Create kubeconfig for controller-manager scheduler and proxy
+      command: >
+        kubectl config set-cluster {{ cluster_name }}
+        --certificate-authority={{ ca_dir }}/ca.crt
+        --embed-certs=true
+        --server=https://server.kubernetes.local:6443
+        --kubeconfig={{ certs_dir }}/"{{ item }}".kubeconfig
+      with_items:
+        - kube-controller-manager
+        - kube-scheduler
+        - kube-proxy
+    - name: Set Credentials for controller-manager scheduler and proxy
+      command: >
+        kubectl config set-credentials system:{{ item }}
+        --client-certificate={{ certs_dir }}/{{ item }}.crt
+        --client-key={{ certs_dir }}/{{ item }}.key
+        --embed-certs=true
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      with_items:
+        - kube-controller-manager
+        - kube-scheduler
+        - kube-proxy
+    - name: Set context for controller-manager scheduler and proxy
+      command: >
+        kubectl config set-context default
+        --cluster={{ cluster_name }}
+        --user=system:{{ item }}
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      with_items:
+        - kube-controller-manager
+        - kube-scheduler
+        - kube-proxy
+    - name: Use context for controller-manager scheduler and proxy
+      command: >
+        kubectl config use-context default
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      with_items:
+        - kube-controller-manager
+        - kube-scheduler
+        - kube-proxy
+
+    - name: Create kubeconfig for admin-machine
+      command: >
+        kubectl config set-cluster {{ cluster_name }}
+        --certificate-authority={{ ca_dir }}/ca.crt
+        --embed-certs=true
+        --server=https://127.0.0.1:6443
+        --kubeconfig={{ certs_dir }}/"{{ item }}".kubeconfig
+      with_items:
+        - "{{ groups['admin-machine'] }}"
+    - name: Set Credentials for admin-machine
+      command: >
+        kubectl config set-credentials admin
+        --client-certificate={{ certs_dir }}/{{ item }}.crt
+        --client-key={{ certs_dir }}/admin-machine.key
+        --embed-certs=true
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      with_items:
+        - "{{ groups['admin-machine'] }}"
+    - name: Set context for admin-machine
+      command: >
+        kubectl config set-context default
+        --cluster={{ cluster_name }}
+        --user=admin
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      with_items:
+        - "{{ groups['admin-machine'] }}"
+    - name: Use context for admin-machine
+      command: >
+        kubectl config use-context default
+        --kubeconfig={{ certs_dir }}/{{ item }}.kubeconfig
+      with_items:
+        - "{{ groups['admin-machine'] }}"
+
+- name: Distribute kubeconfig files to worker nodes
+  shell:  scp -o StrictHostKeyChecking=no -p {{ certs_dir }}/{{ item }}.kubeconfig {{ ansible_user }}@{{ item }}:~;
+          scp -o StrictHostKeyChecking=no -p {{ certs_dir }}/kube-proxy.kubeconfig {{ ansible_user }}@{{ item }}:~
+  loop: "{{ groups['worker'] }}"
+
+- name: Place kubeconfig files in correct path
+  shell: cp ~{{ ansible_user }}/{{ item }}.kubeconfig {{ kubelet_path }} && cp ~{{ ansible_user }}/kube-proxy.kubeconfig {{ kube_proxy_path }}
+  become: true
+  loop: "{{ groups['worker'] }}"
+  delegate_to: "{{ item }}"
+
+- name: Distribute admin, controller-manager and scheduler kubeconfig files
+  shell: scp -o StrictHostKeyChecking=no -p {{ certs_dir }}/kube-controller-manager.kubeconfig {{ ansible_user }}@{{ item }}:~;
+          scp -o StrictHostKeyChecking=no -p {{ certs_dir }}/kube-scheduler.kubeconfig {{ ansible_user }}@{{ item }}:~;
+          scp -o StrictHostKeyChecking=no -p {{ certs_dir }}/admin-machine.kubeconfig {{ ansible_user }}@{{ item }}:~
+  loop: "{{ groups['controller'] }}"
+
+- name: Generate an encryption key
+  shell: head -c 32 /dev/urandom | base64
+  register: ENCRYPTION_KEY
+  tags: now
+
+- debug:
+    var: ENCRYPTION_KEY.stdout
   tags: now

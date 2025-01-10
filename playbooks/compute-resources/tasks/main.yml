@@ -55,10 +55,13 @@
 
 - name: Create directory for kubelet
   ansible.builtin.file:
-    path: "{{ kubelet_path }}"
+    path: "{{ item }}"
     state: directory
     mode: '0700'
   become: true
+  loop:
+    - "{{ kubelet_path }}"
+    - "{{ kube_proxy_path }}"
 
 - name: Update hostfile on kube machines
   become: true

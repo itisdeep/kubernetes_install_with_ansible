@@ -1,4 +1,5 @@
 # vars for compute-resources
 hostname: kube-machines
 kubelet_path: "/var/lib/kubelet"
+kube_proxy_path: "/var/lib/kube-proxy"
 ansible_user: "ansible"
