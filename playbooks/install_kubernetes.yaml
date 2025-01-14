@@ -17,15 +17,22 @@
     - compute-resources
 
 - name: Setup certificates
-  hosts: "admin-machine"
+  hosts: "localhost"
   roles:
     - certs
   tags: 
     - certs
 
 - name: Kubelet Config files
-  hosts: "admin-machine"
+  hosts: "localhost"
   roles:
     - kubeconfig
   tags: 
     - kubeconfig
+
+- name: Encryption
+  hosts: localhost
+  roles:
+    - encryption
+  tags:
+    - encryption

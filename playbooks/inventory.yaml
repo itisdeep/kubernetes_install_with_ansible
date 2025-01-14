@@ -18,6 +18,11 @@ all:
         admin-machine:
           ansible_host: admin-machine
           ansible_user: ansible
+    localhost:
+      hosts:
+        localhost:
+          ansible_host: localhost
+          ansible_user: ansible
     kube-machines:
       children:
         controller:

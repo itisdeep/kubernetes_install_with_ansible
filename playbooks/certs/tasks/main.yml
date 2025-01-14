@@ -1,4 +1,16 @@
 ---
+- name: install prereqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: true
+  loop:
+    - wget
+    - curl
+    - vim
+    - openssl
+    - git
+    
 - name: Ensure certificate directory structure exists
   file:
     path: "{{ item }}"
