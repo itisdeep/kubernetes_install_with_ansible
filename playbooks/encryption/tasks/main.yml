@@ -5,4 +5,11 @@
   register: ENCRYPTION_KEY
 
 - name: Create the encryption-config.yaml encryption config file
-  shell: envsubst < encryption-config.yaml > encryption-config.yaml
+  shell: envsubst < "{{ role_path }}/files/encryption-config.yaml" > encryption-config.yaml
+
+- name: Copy the encryption config to each controller instance
+  shell: "scp -o StrictHostKeyChecking=no -p {{ item.1 }} {{ ansible_user }}@{{ item.0 }}:~"
+  vars:
+    files:
+      - "encryption-config.yaml"
+  loop: "{{ groups['controller'] | product(files) | list }}" 
